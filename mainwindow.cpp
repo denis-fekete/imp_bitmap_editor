@@ -141,5 +141,20 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
 void MainWindow::on_btn_fill_clicked()
 {
     udpManager->sendFill(currentColor);
+
+    for(size_t row = 0; row < gridHeight; row++)
+    {
+        for(size_t col = 0; col < gridWidth; col++)
+        {
+            auto cell = bitmap[row][col];
+            cell->setBrush(QBrush(QColor(
+                currentColor.red(),
+                currentColor.green(),
+                currentColor.blue()
+                )));
+
+            cell->setPen(QPen(Qt::black));
+        }
+    }
 }
 

@@ -45,7 +45,7 @@ void UdpManager::sendRowUncompressed(unsigned row, std::vector<QGraphicsRectItem
 {
     data.clear();
 
-    data.append(0x22); // CMD_SET_ROW_UCMP_NORM = 0x23 - uncompressed and normalized
+    data.append(0x21);
     data.append((unsigned char)row); // ROW - stat should be saved
 
     unsigned char red, green, blue, byte0, byte1;
@@ -86,7 +86,7 @@ void UdpManager::sendRowCompressed(unsigned row, std::vector<QGraphicsRectItem*>
     data.clear();
     unsigned char red, green, blue, byte0, byte1;
 
-    data.append(0x23); // CMD_SET_ROW = 0x22
+    data.append(0x22);
     data.append((unsigned char)row);
 
     for(size_t i = 0; i < line.size(); i++)
@@ -126,7 +126,7 @@ void UdpManager::sendSetPixel(unsigned row, unsigned col, std::vector<std::vecto
     data.clear();
     unsigned char red, green, blue, byte0, byte1;
 
-    data.append(0x26);
+    data.append(0x31);
     data.append((unsigned char)row);
     data.append((unsigned char)col);
 
@@ -169,7 +169,7 @@ void UdpManager::sendPixelVector(std::queue<ChangeRecord>& queue)
     data.clear();
     unsigned char red, green, blue, byte0, byte1;
 
-    data.append(0x30);
+    data.append(0x40);
 
     uint16_t len = queue.size();
     unsigned char len_high = ((len & 0xFF00) >> 8);
