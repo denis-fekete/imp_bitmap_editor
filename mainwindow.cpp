@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <cmath>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -9,8 +10,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     currentColor = QColor();
+    udpManager = new UdpManager(gridWidth, gridHeight);
 
-    scene = new MyScene(&gridWidth, &gridHeight, &cellSize, this, &bitmap, &currentColor, &mutex, &cond, &changes);
+    autoRefresh = false;
+    scene = new MyScene(&gridWidth, &gridHeight, &cellSize, this, &bitmap, &currentColor, &mutex, &cond, &changes, &autoRefresh);
+
+    udpManager->setAddress(ui->ipaddr_input->toPlainText());
+    udpManager->setPort(ui->port_input->value());
 
     MyView* graphicsView = new MyView(this);
     ui->graphicsView = graphicsView;
@@ -22,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-    // ui->graphicsView->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     ui->graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -31,8 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     createGrid();
 
-    udpManager.setAddress(ui->ipaddr_input->toPlainText());
-    udpManager.setPort(ui->port_input->value());
 }
 
 
@@ -43,6 +46,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete scene;
     done = true;
+    delete udpManager;
     cond.notify_one();
 }
 
@@ -54,22 +58,11 @@ void MainWindow::createGrid()
         for(size_t col = 0; col < gridWidth; col++)
         {
             QGraphicsRectItem* cell = new QGraphicsRectItem(col * cellSize, row * cellSize, cellSize, cellSize);
-            // cell->setBrush(QBrush(QColor(fmin(row * 2, 255), fmin(col * 2, 255), fmin(row * col, 255))));
-            cell->setBrush(QBrush(QColor(0, fmin(col * 2, 255), 0)));
-            if(col == gridWidth - 1 && row == gridHeight - 1) {
-                cell->setBrush(QBrush(QColor(255, 255, 255)));
-            }
-            // if(col < 25) {
-            //     cell->setBrush(QBrush(QColor(255, 0, 0)));
-            // } else if(col < 50) {
-            //     cell->setBrush(QBrush(QColor(0, 255, 0)));
-            // } else if(col < 75) {
-            //     cell->setBrush(QBrush(QColor(0, 0, 255)));
-            // } else if(col < 100) {
-            //     cell->setBrush(QBrush(QColor(255, 0, 255)));
-            // } else if(col < 125) {
-            //     cell->setBrush(QBrush(QColor(0, 255, 255)));
-            // }
+            cell->setBrush(QBrush(QColor(
+                std::min(255 - (int)row * 2, 255),
+                std::min((int)col * 2, 255),
+                std::min(std::max(128 - (int)(row * col / 128), 0), 255)
+                )));
 
             cell->setPen(QPen(Qt::black));
 
@@ -107,13 +100,12 @@ void MainWindow::resizeEvent(QResizeEvent*)
 
 void MainWindow::on_btn_send_clicked()
 {
-    udpManager.sendBitmap(gridWidth, gridHeight, bitmap);
+    udpManager->sendBitmap(bitmap, changes, false);
 }
 
-
-void MainWindow::on_btn_save_settings_clicked()
+void MainWindow::on_btn_send_2_clicked()
 {
-
+    udpManager->sendBitmap(bitmap, changes, true);
 }
 
 
@@ -130,12 +122,24 @@ void MainWindow::on_btn_color_select_clicked()
 
 void MainWindow::on_port_input_valueChanged(int arg1)
 {
-    udpManager.setPort(ui->port_input->value());
+    udpManager->setPort(ui->port_input->value());
 }
 
 
 void MainWindow::on_ipaddr_input_textChanged()
 {
-    udpManager.setAddress(ui->ipaddr_input->toPlainText());
+    udpManager->setAddress(ui->ipaddr_input->toPlainText());
+}
+
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    autoRefresh = arg1;
+}
+
+
+void MainWindow::on_btn_fill_clicked()
+{
+    udpManager->sendFill(currentColor);
 }
 

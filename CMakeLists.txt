@@ -17,6 +17,7 @@ qt_add_executable(imp_drawing
     udpmanager.h udpmanager.cpp
     myscene.h myscene.cpp
     myview.h myview.cpp
+    changerecord.h
 )
 
 # Link Qt libraries, including the Network module

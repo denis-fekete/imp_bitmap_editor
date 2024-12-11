@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>812</width>
-    <height>629</height>
+    <width>813</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,7 +120,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <x>0</x>
        <y>220</y>
        <width>171</width>
-       <height>321</height>
+       <height>181</height>
       </rect>
      </property>
      <property name="title">
@@ -149,11 +149,82 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </rect>
       </property>
      </widget>
+     <widget class="QPushButton" name="btn_fill">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>131</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fill and send</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>410</y>
+       <width>191</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Send options</string>
+     </property>
+     <widget class="QPushButton" name="btn_send_2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>131</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Send fast</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>161</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Exprerimental, bugs or crashes may occur</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>130</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Autorefresh</string>
+      </property>
+     </widget>
      <widget class="QPushButton" name="btn_send">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>190</y>
+        <x>30</x>
+        <y>60</y>
         <width>131</width>
         <height>23</height>
        </rect>
@@ -170,7 +241,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>812</width>
+     <width>813</width>
      <height>20</height>
     </rect>
    </property>

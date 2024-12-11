@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include "changerecord.h"
 
 std::mutex* mutexQ;
 std::condition_variable* condition;
 bool* doneCond;
-std::queue<std::pair<unsigned, unsigned>>* queueChanges;
+std::queue<ChangeRecord>* queueChanges;
 std::vector<std::vector<QGraphicsRectItem*>>* bitmapPtr;
-UdpManager* udpMangerPtr;
 
 void udpSenderFunc();
 
@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
     doneCond = &(w.done);
     queueChanges = &(w.changes);
     bitmapPtr = &(w.bitmap);
-    udpMangerPtr = &(w.udpManager);
 
     std::thread udpSender(udpSenderFunc);
 
@@ -38,19 +37,38 @@ int main(int argc, char *argv[])
 }
 
 void udpSenderFunc() {
+    UdpManager udpManager((*bitmapPtr).size(), (bitmapPtr[0]).size());
+
     while (!(*doneCond)) {
         std::unique_lock<std::mutex> lock(*mutexQ);
 
-        condition->wait(lock, []{ return !queueChanges->empty() || (*doneCond); });
+        // condition->wait_for(lock, std::chrono::seconds(1),[] {
+        //     return !queueChanges->empty() || (*doneCond);
+        // });
+
+        condition->wait(lock,[] {
+            return !queueChanges->empty() || (*doneCond);
+        });
 
         while (!queueChanges->empty()) {
-            auto change = queueChanges->front();
-            lock.unlock();
-            udpMangerPtr->sendSetPixel(change.first, change.second, (*bitmapPtr));
-            lock.lock();
-            queueChanges->pop();
+            if(queueChanges->size() <= 255) {
+                std::queue<ChangeRecord> que = (*queueChanges);
+                while (!queueChanges->empty()) {
+                    queueChanges->pop();
+                }
+                lock.unlock();
+
+                udpManager.sendPixelVector(que);
+            } else {
+                auto change = queueChanges->front();
+                udpManager.sendBitmap((*bitmapPtr), (*queueChanges), false);
+                while(!queueChanges->empty())
+                {
+                    queueChanges->pop();
+                }
+                lock.unlock();
+            }
         }
-        lock.unlock();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }

@@ -17,12 +17,16 @@
 #include "udpmanager.h"
 #include "myscene.h"
 #include "myview.h"
+#include "changerecord.h"
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
 
 class MainWindow : public QMainWindow
 {
@@ -35,14 +39,12 @@ public:
     std::mutex mutex;
     std::condition_variable cond;
     bool done;
-    std::queue<std::pair<unsigned, unsigned>> changes;
+    std::queue<ChangeRecord> changes;
     std::vector<std::vector<QGraphicsRectItem*>> bitmap;
-    UdpManager udpManager;
+    UdpManager* udpManager;
 
 private slots:
     void on_btn_send_clicked();
-
-    void on_btn_save_settings_clicked();
 
     void on_btn_color_select_clicked();
 
@@ -50,10 +52,17 @@ private slots:
 
     void on_ipaddr_input_textChanged();
 
+    void on_btn_send_2_clicked();
+
+    void on_checkBox_stateChanged(int arg1);
+
+    void on_btn_fill_clicked();
+
 private:
     unsigned int gridWidth = 131;
     unsigned int gridHeight = 129;
     unsigned int cellSize = 10;
+    bool autoRefresh = false;
 
     QColor currentColor;
 
